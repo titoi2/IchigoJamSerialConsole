@@ -8,7 +8,7 @@ IchigoJamのシリアルをMacに接続し、MacのキーボードをIchigoJam�
 
 シリアル通信のライブラリとしてORSSerialPortをCocoaPodsで使用しています。
 本プロジェクトを取得後、プロジェクトフォルダにて  
-pod install
+pod install  
 を実行して下さい。
 
 CocoaPods実行後、 IchigoJamSerialConsole.xcworkspace を開いてビルドして下さい。
@@ -17,5 +17,5 @@ CocoaPods実行後、 IchigoJamSerialConsole.xcworkspace を開いてビルド�
 
 USBシリアル変換基板などで、MacのUSBとIchigoJamのシリアルを接続してIchigoJamの電源を入れて下さい。  
 本アプリ起動後、Serial:ポップアップボタンから該当するUSBデバイスを選択し、Openボタンを押下します。  
-右上に緑色の丸が表示されたらシリアル接続完了です。本アプリが全面に表示されている状態でMacのキーボードが、IchigoJamのキーボードとして機能します。
+左上に緑色の丸が表示されたらシリアル接続完了です。本アプリが全面に表示されている状態でMacのキーボードが、IchigoJamのキーボードとして機能します。
 
