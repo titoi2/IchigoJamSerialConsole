@@ -1,13 +1,13 @@
 # IchigoJamSerialConsole
 
-IchigoJamのシリアルをMacに接続し、MacのキーボードをIchigoJamのキーボードとして浸かるようにするアプリです。
+IchigoJamのシリアルをMacに接続し、MacのキーボードをIchigoJamのキーボードとして使えるようにするアプリです。
 
 開発環境:Xcode 6.2
 
 # ビルド方法
 
 シリアル通信のライブラリとしてORSSerialPortをCocoaPodsで使用しています。
-本プロジェクトを取得後、プロジェクトフォルダにて
+本プロジェクトを取得後、プロジェクトフォルダにて  
 pod install
 を実行して下さい。
 
@@ -15,4 +15,7 @@ CocoaPods実行後、 IchigoJamSerialConsole.xcworkspace を開いてビルド�
 
 # 使用方法
 
+USBシリアル変換基板などで、MacのUSBとIchigoJamのシリアルを接続してIchigoJamの電源を入れて下さい。  
+本アプリ起動後、Serial:ポップアップボタンから該当するUSBデバイスを選択し、Openボタンを押下します。  
+右上に緑色の丸が表示されたらシリアル接続完了です。本アプリが全面に表示されている状態でMacのキーボードが、IchigoJamのキーボードとして機能します。
 
