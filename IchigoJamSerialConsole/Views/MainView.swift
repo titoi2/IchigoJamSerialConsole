@@ -10,6 +10,7 @@ import Cocoa
 
 protocol KeyInputDelegate {
     func onKeyDown(theEvent: NSEvent);
+    func onKeyUp(theEvent: NSEvent);
 }
 
 class MainView: NSView {
@@ -36,6 +37,13 @@ class MainView: NSView {
         NSLog("Key Down");
         if  let delegate = self.delegate {
             delegate.onKeyDown(theEvent)
+        }
+    }
+    
+    override func keyUp(theEvent: NSEvent) {
+        NSLog("Key Up");
+        if  let delegate = self.delegate {
+            delegate.onKeyUp(theEvent)
         }
     }
 

@@ -22,11 +22,16 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     @IBOutlet weak var connectImageView: NSImageView!
     
+    @IBOutlet weak var echoDispView: NSTextField!
+
     let serialPortManager = ORSSerialPortManager.sharedSerialPortManager()
     var serialPort: ORSSerialPort?
 
     let connectOnImage = NSImage(named: "connect_on")
     let connectOffImage = NSImage(named: "connect_off")
+    
+    
+    var echoString:String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -240,74 +245,143 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         keyDownProc(theEvent)
     }
     
+    func onKeyUp(theEvent: NSEvent) {
+    }
+    
     func onTextViewKeyDown(theEvent: NSEvent) {
         keyDownProc(theEvent)        
     }
     
+    
 
     func keyDownProc(theEvent: NSEvent) {
         if let str = theEvent.characters {
-            let c:Int = Int(first(str.unicodeScalars)!.value)
+            let fs = first(str.unicodeScalars)
+            if fs == nil {
+                return
+            }
+            let c:Int = Int(fs!.value)
             NSLog("VC onKeyDown char:%x", c);
-            var code:UInt8
+            var code:Int = -1
+            var echoback:String = ""
             if c < 0x100 {
-                switch (c) {
+                code = c
+                switch c {
                 case 0x7F:
                     code = 8    // DELETEキーをバックスペースに変換
                 case 0x0D:
-                    code = 10   // ENTERキーをENTERに変換
+                    if (theEvent.keyCode == 24) {
+                        code = 10   // ENTERキーを0x0Aに変換
+                    }
                 default:
-                    code = UInt8(c)
-                    
+                    code = c
                 }
             } else {
                 switch c {
                 case NSUpArrowFunctionKey:
                     code = 30
+                    echoback = "↑"
+
                 case NSDownArrowFunctionKey:
                     code = 31
+                    echoback = "↓"
+
                 case NSLeftArrowFunctionKey:
                     code = 28
+                    echoback = "←"
+
                 case NSRightArrowFunctionKey:
                     code = 29
+                    echoback = "→"
                     
                 case NSDeleteFunctionKey:
                     code = 0x7F
+                    echoback = "DEL"
                     
                 case NSF1FunctionKey:
                     sendString(FUNCTION_KEY_STR_01)
-                    return
+                    echoback = "F1"
+
                 case NSF2FunctionKey:
                     sendString(FUNCTION_KEY_STR_02)
-                    return
+                    echoback = "F2"
+
                 case NSF3FunctionKey:
                     sendString(FUNCTION_KEY_STR_03)
-                    return
+                    echoback = "F3"
+
                 case NSF4FunctionKey:
                     sendString(FUNCTION_KEY_STR_04)
-                    return
+                    echoback = "F4"
+
                 case NSF5FunctionKey:
                     sendString(FUNCTION_KEY_STR_05)
-                    return
+                    echoback = "F5"
+
                 case NSF6FunctionKey:
                     sendString(FUNCTION_KEY_STR_06)
-                    return
+                    echoback = "F6"
+
                 case NSF7FunctionKey:
                     sendString(FUNCTION_KEY_STR_07)
-                    return
+                    echoback = "F7"
+
                 case NSF8FunctionKey:
                     sendString(FUNCTION_KEY_STR_08)
-                    return
+                    echoback = "F8"
                     
                 default:
                     code = 0
                 }
             }
-            sendByte(code)
+            if code != -1 {
+                let c8 = UInt8(code)
+                echoback = codeToEchobackString(c8)
+                sendByte(c8)
+            }
+            appendEchoString( echoback)
         }
     
     }
 
+    let MAX_ECHO_LENGTH = 200;
+    func appendEchoString(echo:String) {
+        echoString += " " + echo
+        let len = countElements(echoString)
+        NSLog("echoString:\(echoString)")
+        if (len > MAX_ECHO_LENGTH ) {
+            let start = len - MAX_ECHO_LENGTH
+            echoString = echoString.substringFromIndex(advance(echoString.startIndex, start))
+            NSLog("AFTER echoString:\(echoString)")
+        }
+        echoDispView.stringValue = echoString
+    }
+    
+    
+    // 8bitコードをエコーバック用文字列に変換
+    func codeToEchobackString(code:UInt8) -> String {
+        var res = ""
+        switch code {
+        case 0x08: res = "BS"
+//        case 0x0A: res = "LF"
+//        case 0x0D: res = "CR"
+        case 0x1B: res = "ESC"
+
+        case 0x1C: res = "←"
+        case 0x1D: res = "→"
+        case 0x1E: res = "↑"
+        case 0x1F: res = "↓"
+
+        case 0x20: res = "SP"
+        case 0x00 ... 0x1A: res = String(bytes: [0x5E, code+0x40, 0], encoding: NSShiftJISStringEncoding)!
+        case 0x7F: res = "DEL"
+        case 0x80 ... 0xA1, 0xE0 ... 0xFF:
+            res = String(format: "%02X", code)
+        default:
+            res = String(bytes: [code,0], encoding: NSShiftJISStringEncoding)!
+        }
+        return res
+    }
     
     @IBAction func pushKanaButton(sender: NSButton) {
 //        sendByte(15)
