@@ -270,7 +270,8 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
                 case 0x7F:
                     code = 8    // DELETEキーをバックスペースに変換
                 case 0x0D:
-                    if (theEvent.keyCode == 24) {
+                    let keycode = theEvent.keyCode
+                    if keycode == 36 {
                         code = 10   // ENTERキーを0x0Aに変換
                     }
                 default:
@@ -385,12 +386,22 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     @IBAction func pushKanaButton(sender: NSButton) {
 //        sendByte(15)
+        stringInput()
+    }
+    
+    
+    @IBAction func pushInsButton(sender: NSButton) {
+        sendByte(17)
+    }
+    
+
+    func stringInput() {
         let alert = NSAlert()
         alert.addButtonWithTitle("OK")
         alert.addButtonWithTitle("Cancel")
         alert.messageText = "半角カナ文字を入力して下さい"
         alert.alertStyle = NSAlertStyle.InformationalAlertStyle
-
+        
         
         let rect = CGRectMake(0, 0, 200, 20)
         var nameBox =  NSTextField(frame: rect)
@@ -400,13 +411,8 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
                 sendString(nameBox.stringValue)
             }
         }
+
     }
-    
-    
-    @IBAction func pushInsButton(sender: NSButton) {
-        sendByte(17)
-    }
-    
     
 }
 
