@@ -22,7 +22,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     @IBOutlet weak var connectImageView: NSImageView!
     
-    @IBOutlet weak var echoDispView: NSTextField!
+    @IBOutlet weak var logDispView: NSTextField!
 
     let serialPortManager = ORSSerialPortManager.sharedSerialPortManager()
     var serialPort: ORSSerialPort?
@@ -31,7 +31,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     let connectOffImage = NSImage(named: "connect_off")
     
     
-    var echoString:String = ""
+    var keyLog:String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -270,7 +270,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             let c:Int = Int(fs!.value)
             NSLog("VC onKeyDown char:%x", c);
             var code:Int = -1
-            var echoback:String = ""
+            var keyInLog:String = ""
             if c < 0x100 {
                 code = c
                 switch c {
@@ -288,55 +288,55 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
                 switch c {
                 case NSUpArrowFunctionKey:
                     code = Int(ICHIGOJAM_KEY_UP)
-                    echoback = "↑"
+                    keyInLog = "↑"
 
                 case NSDownArrowFunctionKey:
                     code = Int(ICHIGOJAM_KEY_DOWN)
-                    echoback = "↓"
+                    keyInLog = "↓"
 
                 case NSLeftArrowFunctionKey:
                     code = Int(ICHIGOJAM_KEY_LEFT)
-                    echoback = "←"
+                    keyInLog = "←"
 
                 case NSRightArrowFunctionKey:
                     code = Int(ICHIGOJAM_KEY_RIGHT)
-                    echoback = "→"
+                    keyInLog = "→"
                     
                 case NSDeleteFunctionKey:
                     code = 0x7F
-                    echoback = "DEL"
+                    keyInLog = "DEL"
                     
                 case NSF1FunctionKey:
                     sendString(FUNCTION_KEY_STR_01)
-                    echoback = "F1"
+                    keyInLog = "F1"
 
                 case NSF2FunctionKey:
                     sendString(FUNCTION_KEY_STR_02)
-                    echoback = "F2"
+                    keyInLog = "F2"
 
                 case NSF3FunctionKey:
                     sendString(FUNCTION_KEY_STR_03)
-                    echoback = "F3"
+                    keyInLog = "F3"
 
                 case NSF4FunctionKey:
                     sendString(FUNCTION_KEY_STR_04)
-                    echoback = "F4"
+                    keyInLog = "F4"
 
                 case NSF5FunctionKey:
                     sendString(FUNCTION_KEY_STR_05)
-                    echoback = "F5"
+                    keyInLog = "F5"
 
                 case NSF6FunctionKey:
                     sendString(FUNCTION_KEY_STR_06)
-                    echoback = "F6"
+                    keyInLog = "F6"
 
                 case NSF7FunctionKey:
                     sendString(FUNCTION_KEY_STR_07)
-                    echoback = "F7"
+                    keyInLog = "F7"
 
                 case NSF8FunctionKey:
                     sendString(FUNCTION_KEY_STR_08)
-                    echoback = "F8"
+                    keyInLog = "F8"
                     
                 default:
                     code = 0
@@ -344,25 +344,23 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             }
             if code != -1 {
                 let c8 = UInt8(code)
-                echoback = codeToEchobackString(c8)
+                keyInLog = codeToEchobackString(c8)
                 sendByte(c8)
             }
-            appendEchoString( echoback)
+            appendEchoString( keyInLog)
         }
     
     }
 
-    let MAX_ECHO_LENGTH = 200;
-    func appendEchoString(echo:String) {
-        echoString += " " + echo
-        let len = countElements(echoString)
-        NSLog("echoString:\(echoString)")
-        if (len > MAX_ECHO_LENGTH ) {
-            let start = len - MAX_ECHO_LENGTH
-            echoString = echoString.substringFromIndex(advance(echoString.startIndex, start))
-            NSLog("AFTER echoString:\(echoString)")
+    let MAX_LOG_LENGTH = 200;
+    func appendEchoString(log:String) {
+        keyLog += " " + log
+        let len = countElements(keyLog)
+        if (len > MAX_LOG_LENGTH ) {
+            let start = len - MAX_LOG_LENGTH
+            keyLog = keyLog.substringFromIndex(advance(keyLog.startIndex, start))
         }
-        echoDispView.stringValue = echoString
+        logDispView.stringValue = keyLog
     }
     
     

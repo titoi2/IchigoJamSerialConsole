@@ -744,7 +744,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="440" id="c4X-e7-PPx"/>
                                         </constraints>
-                                        <textFieldCell key="cell" lineBreakMode="truncatingHead" borderStyle="border" focusRingType="none" alignment="right" placeholderString="ECHO BACK" drawsBackground="YES" id="FMQ-zk-psh">
+                                        <textFieldCell key="cell" lineBreakMode="truncatingHead" borderStyle="border" focusRingType="none" alignment="right" placeholderString="KEY IN LOG" drawsBackground="YES" id="FMQ-zk-psh">
                                             <font key="font" size="24" name="Osaka-Mono"/>
                                             <color key="textColor" red="0.46274509803921571" green="0.47450980392156861" blue="0.3843137254901961" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="backgroundColor" red="0.81568627450980391" green="0.85490196078431369" blue="0.76078431372549016" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -853,7 +853,7 @@
                     </view>
                     <connections>
                         <outlet property="connectImageView" destination="3G1-7z-MWU" id="Deb-NO-rii"/>
-                        <outlet property="echoDispView" destination="F4z-TG-9qo" id="4ZH-bm-nIA"/>
+                        <outlet property="logDispView" destination="F4z-TG-9qo" id="ZBE-G0-sfe"/>
                         <outlet property="logView" destination="phM-64-Sny" id="516-ca-gzu"/>
                         <outlet property="mainView" destination="m2S-Jp-Qdl" id="QM2-Tf-1pV"/>
                         <outlet property="openCloseButton" destination="aqP-ac-jVD" id="RjV-we-i69"/>
