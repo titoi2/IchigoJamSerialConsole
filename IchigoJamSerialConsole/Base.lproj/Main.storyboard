@@ -764,18 +764,47 @@
                                             <action selector="pushInsButton:" target="XfG-lQ-9wD" id="D6a-Le-Hah"/>
                                         </connections>
                                     </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dc0-d4-KNm">
+                                        <rect key="frame" x="371" y="28" width="82" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="21" id="AAo-mB-rym"/>
+                                            <constraint firstAttribute="width" constant="70" id="D3f-Zv-vTu"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="LOAD" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Try-43-d8e">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="pushLoadButton:" target="XfG-lQ-9wD" id="vP2-jx-Icv"/>
+                                        </connections>
+                                    </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SY2-Jy-x7f">
+                                        <rect key="frame" x="371" y="1" width="82" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="70" id="8So-x8-agc"/>
+                                            <constraint firstAttribute="height" constant="21" id="XaK-AT-EYb"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="SAVE" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="uHP-IS-Oeh">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="PKg-ia-VwK" firstAttribute="leading" secondItem="iki-a3-bcl" secondAttribute="trailing" constant="3" id="5s0-hI-DXi"/>
                                     <constraint firstItem="iki-a3-bcl" firstAttribute="leading" secondItem="3G1-7z-MWU" secondAttribute="trailing" constant="10" id="6D0-zK-GqN"/>
                                     <constraint firstItem="F4z-TG-9qo" firstAttribute="leading" secondItem="jb2-MP-gNU" secondAttribute="leading" constant="8" id="7cO-hP-4uQ"/>
+                                    <constraint firstAttribute="trailing" secondItem="Dc0-d4-KNm" secondAttribute="trailing" constant="8" id="8gB-Aa-kBt"/>
                                     <constraint firstItem="F4z-TG-9qo" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="40" id="9Uf-VI-dDU"/>
                                     <constraint firstItem="3G1-7z-MWU" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="8" id="9sl-6V-fJv"/>
                                     <constraint firstItem="1di-4U-RNx" firstAttribute="leading" secondItem="jb2-MP-gNU" secondAttribute="leading" constant="8" id="Ix4-1g-aHs"/>
                                     <constraint firstItem="PmY-Py-GiU" firstAttribute="leading" secondItem="1di-4U-RNx" secondAttribute="trailing" constant="12" id="O0U-n4-43D"/>
                                     <constraint firstItem="iki-a3-bcl" firstAttribute="centerY" secondItem="PKg-ia-VwK" secondAttribute="centerY" id="OVT-9u-kJV"/>
                                     <constraint firstItem="iki-a3-bcl" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="12" id="ZEE-UK-xZP"/>
+                                    <constraint firstItem="Dc0-d4-KNm" firstAttribute="top" secondItem="F4z-TG-9qo" secondAttribute="bottom" constant="8" id="bqn-sP-j9w"/>
                                     <constraint firstItem="iki-a3-bcl" firstAttribute="top" secondItem="aqP-ac-jVD" secondAttribute="top" id="cTu-ya-fDM"/>
+                                    <constraint firstItem="SY2-Jy-x7f" firstAttribute="top" secondItem="Dc0-d4-KNm" secondAttribute="bottom" constant="6" id="gaD-Zm-dLe"/>
+                                    <constraint firstAttribute="trailing" secondItem="SY2-Jy-x7f" secondAttribute="trailing" constant="8" id="nCU-KG-eQd"/>
                                     <constraint firstItem="1di-4U-RNx" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="81" id="nKW-6D-UNG"/>
                                     <constraint firstItem="PmY-Py-GiU" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="81" id="ptw-D6-p9D"/>
                                     <constraint firstItem="3G1-7z-MWU" firstAttribute="leading" secondItem="jb2-MP-gNU" secondAttribute="leading" constant="8" id="sqZ-pU-fYy"/>

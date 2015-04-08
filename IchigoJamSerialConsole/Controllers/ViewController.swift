@@ -223,14 +223,21 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     func sendByte(param:UInt8) {
         var code:UInt8 = param
         let data = NSData(bytes: &code, length:sizeof(UInt8))
-        lock.lock()
-        serialPort?.sendData(data)
-        lock.unlock()
+        if let sp = serialPort {
+            lock.lock()
+            if sp.sendData(data) {
+//                NSLog("SEND SUCCESS data:%02X", code)
+            } else {
+//                NSLog("SEND ERROR")
+            }
+            lock.unlock()
+        }
     }
     
     func sendBytes(s:[UInt8]) {
         for c in s {
             sendByte(c)
+            NSThread.sleepForTimeInterval(0.02)
         }
     }
 
@@ -280,19 +287,19 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             } else {
                 switch c {
                 case NSUpArrowFunctionKey:
-                    code = 30
+                    code = Int(ICHIGOJAM_KEY_UP)
                     echoback = "↑"
 
                 case NSDownArrowFunctionKey:
-                    code = 31
+                    code = Int(ICHIGOJAM_KEY_DOWN)
                     echoback = "↓"
 
                 case NSLeftArrowFunctionKey:
-                    code = 28
+                    code = Int(ICHIGOJAM_KEY_LEFT)
                     echoback = "←"
 
                 case NSRightArrowFunctionKey:
-                    code = 29
+                    code = Int(ICHIGOJAM_KEY_RIGHT)
                     echoback = "→"
                     
                 case NSDeleteFunctionKey:
@@ -394,7 +401,57 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         sendByte(17)
     }
     
+    @IBAction func pushLoadButton(sender: NSButton) {
+        let panel:NSOpenPanel = NSOpenPanel()
+        
+        panel.beginWithCompletionHandler {  [unowned self] (result:Int) -> Void  in
+            if result == NSFileHandlingPanelOKButton {
+                let theDoc: NSURL = panel.URLs[0] as NSURL
+                let path = theDoc.absoluteString
+                  var err: NSError?;
+                let data = NSData(contentsOfURL: theDoc,
+                    options: NSDataReadingOptions.DataReadingMappedIfSafe,
+                    error: &err)
+                if let nerr = err {
+                    NSLog("FILE READ ERROR:\(nerr.localizedDescription)")
+                    return
+                }
+                if let ndata = data {
+                    self.loadData2Ichigojam(ndata)
+                }
+            }
+        }
+    }
 
+    
+    // IchigoJamにファイルデータをプログラムとして転送する
+    func loadData2Ichigojam(data:NSData) {
+        let count:Int! = data.length
+        var buf = [UInt8](count: count, repeatedValue: 0)
+        data.getBytes(&buf, length: count)
+        
+        // プログラム停止、ESC送信
+        sendByte(ICHIGOJAM_KEY_ESC)
+        NSThread.sleepForTimeInterval(0.05)
+        sendString("CLS \u{0000A}")
+        NSThread.sleepForTimeInterval(0.05)
+        // NEWで既存プログラム消去
+        sendString("NEW \u{0000A}")
+        NSThread.sleepForTimeInterval(0.05)
+        for d in buf {
+            if d == 13 {
+                // CRを除去
+                continue
+            }
+            sendByte(d)
+            NSThread.sleepForTimeInterval(0.02)
+        }
+        // 一応、最後に改行
+        sendString("\u{0000A}")
+
+    }
+    
+    
     func stringInput() {
         let alert = NSAlert()
         alert.addButtonWithTitle("OK")

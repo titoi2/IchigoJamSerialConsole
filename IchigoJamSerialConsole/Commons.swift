@@ -18,7 +18,12 @@ let FUNCTION_KEY_STR_06 = "?FREE()\u{0000A}"
 let FUNCTION_KEY_STR_07 = "OUT0\u{0000A}"
 let FUNCTION_KEY_STR_08 = "VIDEO1\u{0000A}"
 
-
+// IchigoJamのキーコード
+let ICHIGOJAM_KEY_ESC:UInt8   = 0x1B
+let ICHIGOJAM_KEY_LEFT:UInt8  = 28
+let ICHIGOJAM_KEY_RIGHT:UInt8 = 29
+let ICHIGOJAM_KEY_UP:UInt8    = 30
+let ICHIGOJAM_KEY_DOWN:UInt8  = 31
 
 func str2UInt8Array(s:String) -> [UInt8]? {
     var buf:[UInt8] = []
