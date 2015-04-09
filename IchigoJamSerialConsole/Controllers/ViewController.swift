@@ -72,7 +72,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         serialPopUpButton.addItemWithTitle(SERIAL_NOT_USE)
         let ports = serialPortManager.availablePorts
         for p in ports {
-            let s:ORSSerialPort = p as ORSSerialPort
+            let s:ORSSerialPort = p as! ORSSerialPort
             NSLog("path:\(s.path)")
             serialPopUpButton.addItemWithTitle(s.path)
         }
@@ -88,7 +88,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             self.serialPort?.delegate = nil
             self.serialPort = nil
         }
-        self.serialPort = ORSSerialPort(path: path)
+        self.serialPort = ORSSerialPort(path: path as String)
         self.serialPort?.baudRate = NSNumber(int: 115200)
         self.serialPort?.delegate = self
 
@@ -134,7 +134,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             logView.textStorage?.beginEditing()
             
             //テキストを追加
-            let atrstr = NSAttributedString(string: string)
+            let atrstr = NSAttributedString(string: string as String)
             logView.textStorage?.appendAttributedString(atrstr)
             
             //描画再開
@@ -180,7 +180,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     func serialPortsWereConnected(notification: NSNotification) {
         if let userInfo = notification.userInfo {
-            let connectedPorts = userInfo[ORSConnectedSerialPortsKey] as [ORSSerialPort]
+            let connectedPorts = userInfo[ORSConnectedSerialPortsKey] as! [ORSSerialPort]
             println("Ports were connected: \(connectedPorts)")
             self.postUserNotificationForConnectedPorts(connectedPorts)
             refreshPortsPopup()
@@ -189,7 +189,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     func serialPortsWereDisconnected(notification: NSNotification) {
         if let userInfo = notification.userInfo {
-            let disconnectedPorts: [ORSSerialPort] = userInfo[ORSDisconnectedSerialPortsKey] as [ORSSerialPort]
+            let disconnectedPorts: [ORSSerialPort] = userInfo[ORSDisconnectedSerialPortsKey] as! [ORSSerialPort]
             println("Ports were disconnected: \(disconnectedPorts)")
             self.postUserNotificationForDisconnectedPorts(disconnectedPorts)
             refreshPortsPopup()
@@ -344,7 +344,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             }
             if code != -1 {
                 let c8 = UInt8(code)
-                keyInLog = codeToEchobackString(c8)
+                keyInLog = codeToEchobackString(code)
                 sendByte(c8)
             }
             appendEchoString( keyInLog)
@@ -355,7 +355,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     let MAX_LOG_LENGTH = 200;
     func appendEchoString(log:String) {
         keyLog += " " + log
-        let len = countElements(keyLog)
+        let len = count(keyLog)
         if (len > MAX_LOG_LENGTH ) {
             let start = len - MAX_LOG_LENGTH
             keyLog = keyLog.substringFromIndex(advance(keyLog.startIndex, start))
@@ -365,7 +365,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     
     // 8bitコードをエコーバック用文字列に変換
-    func codeToEchobackString(code:UInt8) -> String {
+    func codeToEchobackString(code:Int) -> String {
         var res = ""
         switch code {
         case 0x08: res = "BS"
@@ -379,12 +379,12 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         case 0x1F: res = "↓"
 
         case 0x20: res = "SP"
-        case 0x00 ... 0x1A: res = String(bytes: [0x5E, code+0x40, 0], encoding: NSShiftJISStringEncoding)!
+        case 0x00 ... 0x1A: res = String(bytes: [0x5E,UInt8( code+0x40), 0], encoding: NSShiftJISStringEncoding)!
         case 0x7F: res = "DEL"
         case 0x80 ... 0xA1, 0xE0 ... 0xFF:
             res = String(format: "%02X", code)
         default:
-            res = String(bytes: [code,0], encoding: NSShiftJISStringEncoding)!
+            res = String(bytes: [UInt8(code),0], encoding: NSShiftJISStringEncoding)!
         }
         return res
     }
@@ -401,23 +401,27 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     @IBAction func pushLoadButton(sender: NSButton) {
         let panel:NSOpenPanel = NSOpenPanel()
-        
         panel.beginWithCompletionHandler {  [unowned self] (result:Int) -> Void  in
             if result == NSFileHandlingPanelOKButton {
-                let theDoc: NSURL = panel.URLs[0] as NSURL
-                let path = theDoc.absoluteString
-                  var err: NSError?;
-                let data = NSData(contentsOfURL: theDoc,
-                    options: NSDataReadingOptions.DataReadingMappedIfSafe,
-                    error: &err)
-                if let nerr = err {
-                    NSLog("FILE READ ERROR:\(nerr.localizedDescription)")
-                    return
-                }
-                if let ndata = data {
-                    self.loadData2Ichigojam(ndata)
-                }
+                
+                let queue = dispatch_queue_create("queueFileLoad", DISPATCH_QUEUE_SERIAL)
+                    dispatch_async(queue, {
+                        let theDoc: NSURL = panel.URLs[0] as! NSURL
+                        //                let path = theDoc.absoluteString
+                        var err: NSError?;
+                        let data = NSData(contentsOfURL: theDoc,
+                            options: NSDataReadingOptions.DataReadingMappedIfSafe, error: &err)
+                        if let nerr = err {
+                            NSLog("FILE READ ERROR:\(nerr.localizedDescription)")
+                            return
+                        }
+                        if let ndata = data {
+                            self.loadData2Ichigojam(ndata)
+                        }
+                    })
             }
+                
+                
         }
     }
 

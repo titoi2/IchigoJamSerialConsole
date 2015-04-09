@@ -21,27 +21,24 @@ class MainView: NSView {
         super.drawRect(dirtyRect)
 
         // Drawing code here.
+        
+        self.acceptsFirstResponder
     }
-    
-    func acceptsFirstResponder() -> Bool {
-        return true
-    }
-    
-    
+
     override func becomeFirstResponder() -> Bool {
         return true
     }
     
     
     override func keyDown(theEvent: NSEvent) {
-        NSLog("Key Down");
+        NSLog("MainView Key Down");
         if  let delegate = self.delegate {
             delegate.onKeyDown(theEvent)
         }
     }
     
     override func keyUp(theEvent: NSEvent) {
-        NSLog("Key Up");
+        NSLog("MainView Key Up");
         if  let delegate = self.delegate {
             delegate.onKeyUp(theEvent)
         }

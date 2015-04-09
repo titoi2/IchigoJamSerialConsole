@@ -26,4 +26,5 @@ class IJCTextView: NSTextView {
         NSLog("override keyDown")
         keyDownDelegate?.onTextViewKeyDown(theEvent)
     }
+
 }
