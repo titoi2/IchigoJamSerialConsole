@@ -2,7 +2,7 @@
 
 IchigoJamのシリアルをMacに接続し、MacのキーボードをIchigoJamのキーボードとして使えるようにするアプリです。
 
-開発環境:Xcode 6.2
+開発環境:Xcode 6.3
 
 # ビルド方法
 
