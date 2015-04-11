@@ -16,7 +16,7 @@ class FileLoadViewController: NSViewController {
     let serialPortManager = ORSSerialPortManager.sharedSerialPortManager()
     var serialPort: ORSSerialPort?
     
-    var url:NSURL? = nil
+    var fileUrl:NSURL? = nil
     let serialManager = IJCSerialManager.sharedInstance
     
     override func viewDidLoad() {
@@ -24,16 +24,19 @@ class FileLoadViewController: NSViewController {
         // Do view setup here.
         
         
-        progressIndicator.startAnimation(self)
     }
     
-    
+    override func viewDidAppear() {
+        progressIndicator.startAnimation(self)
+        
+        load()
+    }
     
     func load() {
-        if url == nil {
+        if fileUrl == nil {
             return
         }
-        let theDoc = url!
+        let theDoc = fileUrl!
         var err: NSError?;
         let data = NSData(contentsOfURL: theDoc,
             options: NSDataReadingOptions.DataReadingMappedIfSafe, error: &err)

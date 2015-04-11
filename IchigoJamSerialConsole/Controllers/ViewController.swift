@@ -12,6 +12,7 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
 
     
     let SERIAL_NOT_USE = "Serial not use"
+    let SEGUE_LOAD = "load"
     
     @IBOutlet weak var serialPopUpButton: NSPopUpButton!
     @IBOutlet weak var openCloseButton: NSButton!
@@ -32,6 +33,8 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     
     
     var keyLog:String = ""
+    
+    var selectedFileUrl:NSURL?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -248,66 +251,31 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
         let panel:NSOpenPanel = NSOpenPanel()
         panel.beginWithCompletionHandler {  [unowned self] (result:Int) -> Void  in
             if result == NSFileHandlingPanelOKButton {
-                
+                self.selectedFileUrl = panel.URLs[0] as? NSURL
+
                 let queue = dispatch_queue_create("queueFileLoad", DISPATCH_QUEUE_SERIAL)
-                    dispatch_async(queue, {
+                dispatch_async(queue, {
+                    
+                    dispatch_async(dispatch_get_main_queue(), {
                         
-                        dispatch_sync(dispatch_get_main_queue(), {
+                        self.performSegueWithIdentifier(self.SEGUE_LOAD, sender: self)
                         
-                        self.performSegueWithIdentifier("load", sender: self)
-                        
-                            }
-                        )
-                            
-                        return
-
-                        let theDoc: NSURL = panel.URLs[0] as! NSURL
-                        //                let path = theDoc.absoluteString
-                        var err: NSError?;
-                        let data = NSData(contentsOfURL: theDoc,
-                            options: NSDataReadingOptions.DataReadingMappedIfSafe, error: &err)
-                        if let nerr = err {
-                            NSLog("FILE READ ERROR:\(nerr.localizedDescription)")
-                            return
                         }
-                        if let ndata = data {
-                            self.loadData2Ichigojam(ndata)
-                        }
-                    })
+                    )
+                })
             }
-                
+            
                 
         }
     }
 
     
-    // IchigoJamにファイルデータをプログラムとして転送する
-    func loadData2Ichigojam(data:NSData) {
-        let count:Int! = data.length
-        var buf = [UInt8](count: count, repeatedValue: 0)
-        data.getBytes(&buf, length: count)
-        
-        // プログラム停止、ESC送信
-        serialManager.sendByte(ICHIGOJAM_KEY_ESC)
-        NSThread.sleepForTimeInterval(0.05)
-        serialManager.sendString("CLS \u{0000A}")
-        NSThread.sleepForTimeInterval(0.05)
-        // NEWで既存プログラム消去
-        serialManager.sendString("NEW \u{0000A}")
-        NSThread.sleepForTimeInterval(0.05)
-        for d in buf {
-            if d == 13 {
-                // CRを除去
-                continue
-            }
-            serialManager.sendByte(d)
-            NSThread.sleepForTimeInterval(0.02)
+    override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == SEGUE_LOAD {
+            let nextViewController = segue.destinationController as! FileLoadViewController
+            nextViewController.fileUrl = selectedFileUrl
         }
-        // 一応、最後に改行
-        serialManager.sendString("\u{0000A}")
-
     }
-    
     
     func stringInput() {
         let alert = NSAlert()
