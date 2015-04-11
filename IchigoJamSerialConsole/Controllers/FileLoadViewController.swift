@@ -19,6 +19,7 @@ class FileLoadViewController: NSViewController {
     var fileUrl:NSURL? = nil
     let serialManager = IJCSerialManager.sharedInstance
     
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
@@ -29,7 +30,29 @@ class FileLoadViewController: NSViewController {
     override func viewDidAppear() {
         progressIndicator.startAnimation(self)
         
-        load()
+        
+        let panel:NSOpenPanel = NSOpenPanel()
+        panel.beginWithCompletionHandler {  [unowned self] (result:Int) -> Void  in
+            if result == NSFileHandlingPanelOKButton {
+                self.fileUrl = panel.URLs[0] as? NSURL
+                
+                let queue = dispatch_queue_create("queueFileLoad", DISPATCH_QUEUE_SERIAL)
+                dispatch_async(queue, {
+                    self.load()
+                    
+                    dispatch_sync(dispatch_get_main_queue(), {
+                        
+                        
+                        }
+                    )
+                })
+            } else {
+                self.dismissViewController(self)
+            }
+            
+            
+        }
+
     }
     
     func load() {

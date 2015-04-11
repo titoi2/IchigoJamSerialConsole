@@ -33,9 +33,7 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     
     
     var keyLog:String = ""
-    
-    var selectedFileUrl:NSURL?
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -247,33 +245,14 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     }
     
     @IBAction func pushLoadButton(sender: NSButton) {
-        
-        let panel:NSOpenPanel = NSOpenPanel()
-        panel.beginWithCompletionHandler {  [unowned self] (result:Int) -> Void  in
-            if result == NSFileHandlingPanelOKButton {
-                self.selectedFileUrl = panel.URLs[0] as? NSURL
-
-                let queue = dispatch_queue_create("queueFileLoad", DISPATCH_QUEUE_SERIAL)
-                dispatch_async(queue, {
-                    
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        self.performSegueWithIdentifier(self.SEGUE_LOAD, sender: self)
-                        
-                        }
-                    )
-                })
-            }
-            
-                
-        }
+        self.performSegueWithIdentifier(self.SEGUE_LOAD, sender: self)
     }
 
     
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == SEGUE_LOAD {
-            let nextViewController = segue.destinationController as! FileLoadViewController
-            nextViewController.fileUrl = selectedFileUrl
+//            let nextViewController = segue.destinationController as! FileLoadViewController
+//            nextViewController.fileUrl = selectedFileUrl
         }
     }
     
