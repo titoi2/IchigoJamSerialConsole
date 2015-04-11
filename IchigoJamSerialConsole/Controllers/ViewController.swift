@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate, IJCTextViewDelegate {
+class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelegate, IJCTextViewDelegate {
 
     
     let SERIAL_NOT_USE = "Serial not use"
@@ -24,9 +24,9 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     @IBOutlet weak var logDispView: NSTextField!
 
-    let serialPortManager = ORSSerialPortManager.sharedSerialPortManager()
-    var serialPort: ORSSerialPort?
-
+    
+    let serialManager = IJCSerialManager.sharedInstance
+    
     let connectOnImage = NSImage(named: "connect_on")
     let connectOffImage = NSImage(named: "connect_off")
     
@@ -43,7 +43,8 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         nc.addObserver(self, selector: "serialPortsWereDisconnected:", name: ORSSerialPortsWereDisconnectedNotification, object: nil)
         
         logView.keyDownDelegate = self
-
+        serialManager.delegate = self
+        
         refreshPortsPopup()
     }
 
@@ -52,11 +53,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     override func viewWillDisappear() {
         super.viewWillDisappear()
         
-        if  self.serialPort != nil {
-            self.serialPort?.close()
-            self.serialPort?.delegate = nil
-            self.serialPort = nil
-        }
+        serialManager.close()
     }
     
     override var representedObject: AnyObject? {
@@ -70,7 +67,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     func refreshPortsPopup() {
         serialPopUpButton.removeAllItems()
         serialPopUpButton.addItemWithTitle(SERIAL_NOT_USE)
-        let ports = serialPortManager.availablePorts
+        let ports = serialManager.ports()
         for p in ports {
             let s:ORSSerialPort = p as! ORSSerialPort
             NSLog("path:\(s.path)")
@@ -82,170 +79,17 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     @IBAction func pushSerialOpenCloseButton(sender: NSButton) {
         let path:NSString = serialPopUpButton.titleOfSelectedItem!
         
-        
-        if  self.serialPort != nil {
-            self.serialPort?.close()
-            self.serialPort?.delegate = nil
-            self.serialPort = nil
-        }
-        self.serialPort = ORSSerialPort(path: path as String)
-        self.serialPort?.baudRate = NSNumber(int: 115200)
-        self.serialPort?.delegate = self
-
-        if let port = self.serialPort {
-            if (port.open) {
-                port.close()
-            } else {
-                port.open()
-            }
-        }
+        serialManager.open(path as String)
     }
     
 
     
-    // MARK: - ORSSerialPortDelegate
-    
-    func serialPortWasOpened(serialPort: ORSSerialPort!) {
-        connectImageView.image = connectOnImage
-    }
-    
-    func serialPortWasClosed(serialPort: ORSSerialPort!) {
-        connectImageView.image = connectOffImage
-    }
-    
-    func serialPort(serialPort: ORSSerialPort!, didReceiveData data: NSData!) {
-        NSLog("Receive Length:\(data.length)")
-        /*
-        let bytes = UnsafePointer<UInt8>(data.bytes)
-        for i in 0..<data.length {
-            NSLog("buf DATA:%02X",bytes[i])
-        }
-        */
-        if let string = NSString(data: data, encoding: NSShiftJISStringEncoding) {
-            NSLog("received:\(string)")
-        
-            logView.selectAll(nil)
-            var wholeRange:NSRange = logView.selectedRange()
-            var endRange:NSRange  = NSMakeRange(wholeRange.length, 0)
-            logView.setSelectedRange(endRange)
-            logView.insertText(string)
-
-            //描画を一時的に止める
-            logView.textStorage?.beginEditing()
-            
-            //テキストを追加
-            let atrstr = NSAttributedString(string: string as String)
-            logView.textStorage?.appendAttributedString(atrstr)
-            
-            //描画再開
-            logView.textStorage?.endEditing()
-            
-            //最終行へスクロール
-            let theEvent: NSEvent = NSEvent()
-            logView.autoscroll(theEvent)
-            
-        } else {
-            //描画を一時的に止める
-            logView.textStorage?.beginEditing()
-            
-            //テキストを追加
-            let atrstr = NSAttributedString(string: "デコードエラー")
-            logView.textStorage?.appendAttributedString(atrstr)
-            
-            //描画再開
-            logView.textStorage?.endEditing()
-            
-            //最終行へスクロール
-            let theEvent: NSEvent = NSEvent()
-            logView.autoscroll(theEvent)
-            
-        }
-    }
 
     
     
     
-    func serialPortWasRemovedFromSystem(serialPort: ORSSerialPort!) {
-        self.serialPort = nil
-        self.openCloseButton.title = "Open"
-    }
-    
-    func serialPort(serialPort: ORSSerialPort!, didEncounterError error: NSError!) {
-        println("SerialPort \(serialPort) encountered an error: \(error)")
-    }
     
     
-    
-    // MARK: - Notifications
-    
-    func serialPortsWereConnected(notification: NSNotification) {
-        if let userInfo = notification.userInfo {
-            let connectedPorts = userInfo[ORSConnectedSerialPortsKey] as! [ORSSerialPort]
-            println("Ports were connected: \(connectedPorts)")
-            self.postUserNotificationForConnectedPorts(connectedPorts)
-            refreshPortsPopup()
-        }
-    }
-    
-    func serialPortsWereDisconnected(notification: NSNotification) {
-        if let userInfo = notification.userInfo {
-            let disconnectedPorts: [ORSSerialPort] = userInfo[ORSDisconnectedSerialPortsKey] as! [ORSSerialPort]
-            println("Ports were disconnected: \(disconnectedPorts)")
-            self.postUserNotificationForDisconnectedPorts(disconnectedPorts)
-            refreshPortsPopup()
-        }
-    }
-    
-    func postUserNotificationForConnectedPorts(connectedPorts: [ORSSerialPort]) {
-        let unc = NSUserNotificationCenter.defaultUserNotificationCenter()
-        for port in connectedPorts {
-            let userNote = NSUserNotification()
-            userNote.title = NSLocalizedString("Serial Port Connected", comment: "Serial Port Connected")
-            userNote.informativeText = "Serial Port \(port.name) was connected to your Mac."
-            userNote.soundName = nil;
-            unc.deliverNotification(userNote)
-        }
-    }
-    
-    func postUserNotificationForDisconnectedPorts(disconnectedPorts: [ORSSerialPort]) {
-        let unc = NSUserNotificationCenter.defaultUserNotificationCenter()
-        for port in disconnectedPorts {
-            let userNote = NSUserNotification()
-            userNote.title = NSLocalizedString("Serial Port Disconnected", comment: "Serial Port Disconnected")
-            userNote.informativeText = "Serial Port \(port.name) was disconnected from your Mac."
-            userNote.soundName = nil;
-            unc.deliverNotification(userNote)
-        }
-    }
-    
-    let lock = NSLock()
-
-    func sendByte(param:UInt8) {
-        var code:UInt8 = param
-        let data = NSData(bytes: &code, length:sizeof(UInt8))
-        if let sp = serialPort {
-            lock.lock()
-            if sp.sendData(data) {
-//                NSLog("SEND SUCCESS data:%02X", code)
-            } else {
-//                NSLog("SEND ERROR")
-            }
-            lock.unlock()
-        }
-    }
-    
-    func sendBytes(s:[UInt8]) {
-        for c in s {
-            sendByte(c)
-            NSThread.sleepForTimeInterval(0.02)
-        }
-    }
-
-    func sendString(str:String) {
-        if let buf = str2UInt8Array(str) {
-            sendBytes(buf)
-        }
-    }
 
     func onKeyDown(theEvent: NSEvent) {
         NSLog("VC onKeyDown keycode:%x", theEvent.keyCode);
@@ -307,35 +151,35 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
                     keyInLog = "DEL"
                     
                 case NSF1FunctionKey:
-                    sendString(FUNCTION_KEY_STR_01)
+                    serialManager.sendString(FUNCTION_KEY_STR_01)
                     keyInLog = "F1"
 
                 case NSF2FunctionKey:
-                    sendString(FUNCTION_KEY_STR_02)
+                    serialManager.sendString(FUNCTION_KEY_STR_02)
                     keyInLog = "F2"
 
                 case NSF3FunctionKey:
-                    sendString(FUNCTION_KEY_STR_03)
+                    serialManager.sendString(FUNCTION_KEY_STR_03)
                     keyInLog = "F3"
 
                 case NSF4FunctionKey:
-                    sendString(FUNCTION_KEY_STR_04)
+                    serialManager.sendString(FUNCTION_KEY_STR_04)
                     keyInLog = "F4"
 
                 case NSF5FunctionKey:
-                    sendString(FUNCTION_KEY_STR_05)
+                    serialManager.sendString(FUNCTION_KEY_STR_05)
                     keyInLog = "F5"
 
                 case NSF6FunctionKey:
-                    sendString(FUNCTION_KEY_STR_06)
+                    serialManager.sendString(FUNCTION_KEY_STR_06)
                     keyInLog = "F6"
 
                 case NSF7FunctionKey:
-                    sendString(FUNCTION_KEY_STR_07)
+                    serialManager.sendString(FUNCTION_KEY_STR_07)
                     keyInLog = "F7"
 
                 case NSF8FunctionKey:
-                    sendString(FUNCTION_KEY_STR_08)
+                    serialManager.sendString(FUNCTION_KEY_STR_08)
                     keyInLog = "F8"
                     
                 default:
@@ -345,7 +189,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
             if code != -1 {
                 let c8 = UInt8(code)
                 keyInLog = codeToEchobackString(code)
-                sendByte(c8)
+                serialManager.sendByte(c8)
             }
             appendEchoString( keyInLog)
         }
@@ -396,16 +240,27 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
     
     
     @IBAction func pushInsButton(sender: NSButton) {
-        sendByte(17)
+        serialManager.sendByte(17)
     }
     
     @IBAction func pushLoadButton(sender: NSButton) {
+        
         let panel:NSOpenPanel = NSOpenPanel()
         panel.beginWithCompletionHandler {  [unowned self] (result:Int) -> Void  in
             if result == NSFileHandlingPanelOKButton {
                 
                 let queue = dispatch_queue_create("queueFileLoad", DISPATCH_QUEUE_SERIAL)
                     dispatch_async(queue, {
+                        
+                        dispatch_sync(dispatch_get_main_queue(), {
+                        
+                        self.performSegueWithIdentifier("load", sender: self)
+                        
+                            }
+                        )
+                            
+                        return
+
                         let theDoc: NSURL = panel.URLs[0] as! NSURL
                         //                let path = theDoc.absoluteString
                         var err: NSError?;
@@ -433,23 +288,23 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         data.getBytes(&buf, length: count)
         
         // プログラム停止、ESC送信
-        sendByte(ICHIGOJAM_KEY_ESC)
+        serialManager.sendByte(ICHIGOJAM_KEY_ESC)
         NSThread.sleepForTimeInterval(0.05)
-        sendString("CLS \u{0000A}")
+        serialManager.sendString("CLS \u{0000A}")
         NSThread.sleepForTimeInterval(0.05)
         // NEWで既存プログラム消去
-        sendString("NEW \u{0000A}")
+        serialManager.sendString("NEW \u{0000A}")
         NSThread.sleepForTimeInterval(0.05)
         for d in buf {
             if d == 13 {
                 // CRを除去
                 continue
             }
-            sendByte(d)
+            serialManager.sendByte(d)
             NSThread.sleepForTimeInterval(0.02)
         }
         // 一応、最後に改行
-        sendString("\u{0000A}")
+        serialManager.sendString("\u{0000A}")
 
     }
     
@@ -467,11 +322,74 @@ class ViewController: NSViewController, ORSSerialPortDelegate, KeyInputDelegate,
         alert.accessoryView = nameBox
         if  alert.runModal() == NSAlertFirstButtonReturn {
             if !nameBox.stringValue.isEmpty {
-                sendString(nameBox.stringValue)
+                serialManager.sendString(nameBox.stringValue)
             }
         }
 
     }
+
     
+    func serialPortRemoved() {
+        serialManager.close()
+    }
+
+    func serialPortOpene() {
+        connectImageView.image = connectOnImage
+    }
+    
+    func serialPortClosed() {
+        connectImageView.image = connectOffImage
+    }
+    
+    func serialPortReceived(data: NSData!) {
+        if let string = NSString(data: data, encoding: NSShiftJISStringEncoding) {
+            NSLog("received:\(string)")
+            
+            logView.selectAll(nil)
+            var wholeRange:NSRange = logView.selectedRange()
+            var endRange:NSRange  = NSMakeRange(wholeRange.length, 0)
+            logView.setSelectedRange(endRange)
+            logView.insertText(string)
+            
+            //描画を一時的に止める
+            logView.textStorage?.beginEditing()
+            
+            //テキストを追加
+            let atrstr = NSAttributedString(string: string as String)
+            logView.textStorage?.appendAttributedString(atrstr)
+            
+            //描画再開
+            logView.textStorage?.endEditing()
+            
+            //最終行へスクロール
+            let theEvent: NSEvent = NSEvent()
+            logView.autoscroll(theEvent)
+            
+        } else {
+            //描画を一時的に止める
+            logView.textStorage?.beginEditing()
+            
+            //テキストを追加
+            let atrstr = NSAttributedString(string: "デコードエラー")
+            logView.textStorage?.appendAttributedString(atrstr)
+            
+            //描画再開
+            logView.textStorage?.endEditing()
+            
+            //最終行へスクロール
+            let theEvent: NSEvent = NSEvent()
+            logView.autoscroll(theEvent)
+            
+        }
+    }
+    
+    func serialPortsWereConnected() {
+        refreshPortsPopup()
+    }
+    func serialPortsWereDisconnected() {
+        refreshPortsPopup()
+    }
+
 }
+
 
