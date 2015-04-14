@@ -18,7 +18,8 @@ class FileLoadViewController: NSViewController {
     
     var fileUrl:NSURL? = nil
     let serialManager = IJCSerialManager.sharedInstance
-    
+    var loadStop:Bool = false
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,10 +50,10 @@ class FileLoadViewController: NSViewController {
             } else {
                 self.dismissViewController(self)
             }
-            
-            
         }
-
+    }
+    
+    override func viewDidDisappear() {
     }
     
     func load() {
@@ -73,7 +74,6 @@ class FileLoadViewController: NSViewController {
 
     }
     
-
     // IchigoJamにファイルデータをプログラムとして転送する
     func loadData2Ichigojam(data:NSData) {
         let count:Int! = data.length
@@ -88,7 +88,14 @@ class FileLoadViewController: NSViewController {
         // NEWで既存プログラム消去
         serialManager.sendString("NEW \u{0000A}")
         NSThread.sleepForTimeInterval(0.05)
-        for d in buf {
+        progressIndicator.maxValue = Double(buf.count)
+        loadStop = false
+        for var i=0; i < buf.count; i++ {
+            if loadStop {
+                break
+            }
+            progressIndicator.incrementBy(1.0)
+            let d = buf[i]
             if d == 13 {
                 // CRを除去
                 continue
@@ -97,10 +104,15 @@ class FileLoadViewController: NSViewController {
             NSThread.sleepForTimeInterval(0.02)
         }
         // 一応、最後に改行
-        serialManager.sendString("\u{0000A}")
-        
+        if !loadStop {
+            serialManager.sendString("\u{0000A}")
+        }
+        dismissViewController(self)
     }
+    
     @IBAction func pushCancelButton(sender: NSButton) {
+        loadStop = true
+
         dismissViewController(self)
     }
 }

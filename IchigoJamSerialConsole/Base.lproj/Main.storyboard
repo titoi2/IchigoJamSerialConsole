@@ -873,8 +873,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <progressIndicator fixedFrame="YES" maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Oa4-VU-Zf5">
-                                <rect key="frame" x="120" y="197" width="96" height="20"/>
+                            <progressIndicator fixedFrame="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Oa4-VU-Zf5">
+                                <rect key="frame" x="37" y="197" width="175" height="20"/>
                             </progressIndicator>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XcZ-SK-HkM">
                                 <rect key="frame" x="39" y="31" width="82" height="32"/>
