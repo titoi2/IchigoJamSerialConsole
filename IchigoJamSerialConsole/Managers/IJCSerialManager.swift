@@ -11,7 +11,7 @@ import Foundation
 
 protocol IJCSerialManagerDelegate {
     func serialPortRemoved()
-    func serialPortOpene()
+    func serialPortOpened()
     func serialPortClosed()
     func serialPortReceived(data: NSData!)
     func serialPortsWereConnected()
@@ -95,7 +95,7 @@ class IJCSerialManager:NSObject, ORSSerialPortDelegate {
     
     func serialPortWasOpened(serialPort: ORSSerialPort!) {
         if let d = delegate {
-            d.serialPortOpene()
+            d.serialPortOpened()
         }
     }
     
@@ -178,5 +178,11 @@ class IJCSerialManager:NSObject, ORSSerialPortDelegate {
         }
     }
 
+    func serialIsOpen() -> Bool {
+        if let sp = self.serialPort {
+            return sp.open
+        }
+        return false
+    }
 }
 

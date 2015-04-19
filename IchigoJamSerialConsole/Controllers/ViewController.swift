@@ -79,8 +79,11 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     
     @IBAction func pushSerialOpenCloseButton(sender: NSButton) {
         let path:NSString = serialPopUpButton.titleOfSelectedItem!
-        
-        serialManager.open(path as String)
+        if serialManager.serialIsOpen() {
+            serialManager.close()
+        } else {
+            serialManager.open(path as String)
+        }
     }
     
 
@@ -280,12 +283,14 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
         serialManager.close()
     }
 
-    func serialPortOpene() {
+    func serialPortOpened() {
         connectImageView.image = connectOnImage
+        openCloseButton.title = "Close"
     }
     
     func serialPortClosed() {
         connectImageView.image = connectOffImage
+        openCloseButton.title = "Open"
     }
     
     func serialPortReceived(data: NSData!) {
