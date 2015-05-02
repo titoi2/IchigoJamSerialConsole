@@ -251,6 +251,9 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
         self.performSegueWithIdentifier(self.SEGUE_LOAD, sender: self)
     }
 
+    @IBAction func pushLogClearButton(sender: NSButton) {
+        logView.string = ""
+    }
     
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == SEGUE_LOAD {
