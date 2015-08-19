@@ -297,6 +297,14 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     }
     
     func serialPortReceived(data: NSData!) {
+        
+        
+        let len = data.length
+        var buffer = [UInt8](count: len, repeatedValue: 0x00)
+        data.getBytes(&buffer, length:len)
+        NSLog("bytes:\(buffer)")
+        
+
         if let string = NSString(data: data, encoding: NSShiftJISStringEncoding) {
             NSLog("received:\(string)")
             

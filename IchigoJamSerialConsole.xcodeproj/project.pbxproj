@@ -20,6 +20,8 @@
 		E193DF8E1ACD670100D6CEE9 /* IchigoJamSerialConsole.icns in Resources */ = {isa = PBXBuildFile; fileRef = E193DF8D1ACD670100D6CEE9 /* IchigoJamSerialConsole.icns */; };
 		E193DF921ACDC8C600D6CEE9 /* connect_off@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E193DF901ACDC8C600D6CEE9 /* connect_off@2x.png */; };
 		E193DF931ACDC8C600D6CEE9 /* connect_on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E193DF911ACDC8C600D6CEE9 /* connect_on@2x.png */; };
+		E1D8A9CD1B825EF600EF6C2D /* MonitorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D8A9CC1B825EF600EF6C2D /* MonitorManager.swift */; };
+		E1D8A9D11B83A42E00EF6C2D /* ichigo_chars.png in Resources */ = {isa = PBXBuildFile; fileRef = E1D8A9D01B83A42E00EF6C2D /* ichigo_chars.png */; };
 		E1EC4B051AD841C700F64FBA /* FileLoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EC4B031AD841C700F64FBA /* FileLoadViewController.swift */; };
 		E1EC4B0E1AD9D3F200F64FBA /* IJCSerialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1EC4B0D1AD9D3F200F64FBA /* IJCSerialManager.swift */; };
 /* End PBXBuildFile section */
@@ -55,6 +57,8 @@
 		E193DF8D1ACD670100D6CEE9 /* IchigoJamSerialConsole.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = IchigoJamSerialConsole.icns; sourceTree = "<group>"; };
 		E193DF901ACDC8C600D6CEE9 /* connect_off@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "connect_off@2x.png"; sourceTree = "<group>"; };
 		E193DF911ACDC8C600D6CEE9 /* connect_on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "connect_on@2x.png"; sourceTree = "<group>"; };
+		E1D8A9CC1B825EF600EF6C2D /* MonitorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitorManager.swift; sourceTree = "<group>"; };
+		E1D8A9D01B83A42E00EF6C2D /* ichigo_chars.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ichigo_chars.png; sourceTree = "<group>"; };
 		E1EC4B031AD841C700F64FBA /* FileLoadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileLoadViewController.swift; sourceTree = "<group>"; };
 		E1EC4B0D1AD9D3F200F64FBA /* IJCSerialManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IJCSerialManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -180,6 +184,7 @@
 		E193DF8F1ACDC8C600D6CEE9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E1D8A9D01B83A42E00EF6C2D /* ichigo_chars.png */,
 				E193DF901ACDC8C600D6CEE9 /* connect_off@2x.png */,
 				E193DF911ACDC8C600D6CEE9 /* connect_on@2x.png */,
 			);
@@ -190,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				E1EC4B0D1AD9D3F200F64FBA /* IJCSerialManager.swift */,
+				E1D8A9CC1B825EF600EF6C2D /* MonitorManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -281,6 +287,7 @@
 				E193DF931ACDC8C600D6CEE9 /* connect_on@2x.png in Resources */,
 				E193DF801ACC5CC700D6CEE9 /* references.txt in Resources */,
 				E193DF921ACDC8C600D6CEE9 /* connect_off@2x.png in Resources */,
+				E1D8A9D11B83A42E00EF6C2D /* ichigo_chars.png in Resources */,
 				E193DF591ACC5BE100D6CEE9 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -333,6 +340,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E193DF761ACC5CAB00D6CEE9 /* ViewController.swift in Sources */,
+				E1D8A9CD1B825EF600EF6C2D /* MonitorManager.swift in Sources */,
 				E1EC4B0E1AD9D3F200F64FBA /* IJCSerialManager.swift in Sources */,
 				E193DF7B1ACC5CB800D6CEE9 /* MainView.swift in Sources */,
 				E1EC4B051AD841C700F64FBA /* FileLoadViewController.swift in Sources */,
