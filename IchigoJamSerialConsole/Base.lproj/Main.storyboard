@@ -898,10 +898,10 @@
             </objects>
             <point key="canvasLocation" x="-101.5" y="682"/>
         </scene>
-        <!--Monitor View Controller-->
+        <!--Monitor-->
         <scene sceneID="cxS-z1-IZc">
             <objects>
-                <viewController showSeguePresentationStyle="single" id="ooE-7a-9jL" customClass="MonitorViewController" customModule="IchigoJamSerialConsole" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Monitor" showSeguePresentationStyle="single" id="ooE-7a-9jL" customClass="MonitorViewController" customModule="IchigoJamSerialConsole" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Xqj-ku-Vwf">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
