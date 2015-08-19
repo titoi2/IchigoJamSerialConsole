@@ -31,7 +31,8 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     let connectOnImage = NSImage(named: "connect_on")
     let connectOffImage = NSImage(named: "connect_off")
     
-    
+    let monitorManager = MonitorManager.sharedInstance
+
     var keyLog:String = ""
         
     override func viewDidLoad() {
@@ -304,7 +305,9 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
         data.getBytes(&buffer, length:len)
         NSLog("bytes:\(buffer)")
         
-
+        // モニタに反映
+        monitorManager.interpret(buffer)
+        
         if let string = NSString(data: data, encoding: NSShiftJISStringEncoding) {
             NSLog("received:\(string)")
             

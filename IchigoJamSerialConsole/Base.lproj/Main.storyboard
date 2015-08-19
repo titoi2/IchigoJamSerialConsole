@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14E7f" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7702"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -803,6 +803,21 @@
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                     </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="plw-hu-mq7">
+                                        <rect key="frame" x="296" y="48" width="82" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="21" id="gYS-wh-NX1"/>
+                                            <constraint firstAttribute="width" constant="70" id="qfJ-0N-91c"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="Monitor" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FY1-My-y7i">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="pushLoadButton:" target="XfG-lQ-9wD" id="8yO-4r-rS0"/>
+                                            <segue destination="ooE-7a-9jL" kind="show" id="P5G-1S-T1Q"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="smB-Dq-Lfi" secondAttribute="trailing" constant="8" id="1Pl-KZ-6R2"/>
@@ -819,6 +834,8 @@
                                     <constraint firstItem="Dc0-d4-KNm" firstAttribute="top" secondItem="F4z-TG-9qo" secondAttribute="bottom" constant="8" id="bqn-sP-j9w"/>
                                     <constraint firstItem="iki-a3-bcl" firstAttribute="top" secondItem="aqP-ac-jVD" secondAttribute="top" id="cTu-ya-fDM"/>
                                     <constraint firstItem="SY2-Jy-x7f" firstAttribute="top" secondItem="Dc0-d4-KNm" secondAttribute="bottom" constant="6" id="gaD-Zm-dLe"/>
+                                    <constraint firstItem="plw-hu-mq7" firstAttribute="top" secondItem="F4z-TG-9qo" secondAttribute="bottom" constant="8" id="k1E-ao-3hX"/>
+                                    <constraint firstItem="Dc0-d4-KNm" firstAttribute="leading" secondItem="plw-hu-mq7" secondAttribute="trailing" constant="5" id="m8y-ga-Ov5"/>
                                     <constraint firstAttribute="trailing" secondItem="SY2-Jy-x7f" secondAttribute="trailing" constant="8" id="nCU-KG-eQd"/>
                                     <constraint firstItem="1di-4U-RNx" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="81" id="nKW-6D-UNG"/>
                                     <constraint firstItem="PmY-Py-GiU" firstAttribute="top" secondItem="jb2-MP-gNU" secondAttribute="top" constant="81" id="ptw-D6-p9D"/>
@@ -880,6 +897,34 @@
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-101.5" y="682"/>
+        </scene>
+        <!--Monitor View Controller-->
+        <scene sceneID="cxS-z1-IZc">
+            <objects>
+                <viewController showSeguePresentationStyle="single" id="ooE-7a-9jL" customClass="MonitorViewController" customModule="IchigoJamSerialConsole" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="Xqj-ku-Vwf">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7Jt-Km-cXV">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="b2j-iR-JY4"/>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="7Jt-Km-cXV" firstAttribute="top" secondItem="Xqj-ku-Vwf" secondAttribute="top" id="ClE-L9-ug3"/>
+                            <constraint firstAttribute="bottom" secondItem="7Jt-Km-cXV" secondAttribute="bottom" id="Hxk-7Z-5LU"/>
+                            <constraint firstItem="7Jt-Km-cXV" firstAttribute="leading" secondItem="Xqj-ku-Vwf" secondAttribute="leading" id="ViD-fn-hHS"/>
+                            <constraint firstAttribute="trailing" secondItem="7Jt-Km-cXV" secondAttribute="trailing" id="cDP-BI-255"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="imageView" destination="7Jt-Km-cXV" id="ALX-6N-NDP"/>
+                    </connections>
+                </viewController>
+                <customObject id="Muv-Uz-99E" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="460" y="690"/>
         </scene>
         <!--File Load View Controller-->
         <scene sceneID="tk1-pc-WFN">
