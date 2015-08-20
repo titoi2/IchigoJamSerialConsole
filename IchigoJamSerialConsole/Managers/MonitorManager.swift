@@ -43,8 +43,16 @@ class MonitorManager:NSObject {
     private  override init() {
         width = SCREEN_CHARA_WIDTH
         height = SCREEN_CHARA_HEIGTH
-        vram = [[UInt8]](count: height, repeatedValue: [UInt8](count: width, repeatedValue: 0))
+        vram = [[UInt8]](count: height, repeatedValue: [UInt8](count: width, repeatedValue: 0x20))
         
+        super.init()
+        
+        for y in 0 ..< height {
+            for x in 0 ..< width {
+                putChar( x, y: y, c: 0x20)
+            }
+        }
+
     }
     
     
@@ -52,12 +60,12 @@ class MonitorManager:NSObject {
         for c in str {
             switch interpreterState {
             case .TakeX:
-                cursorX = Int(c) - 32
+                cursorX = Int(c) - 32 - 1
                 interpreterState = .TakeY
                 break
                 
             case .TakeY:
-                cursorY = Int(c) - 32
+                cursorY = Int(c) - 32 - 1
                 interpreterState = .Idle
                 break
                 
@@ -79,7 +87,7 @@ class MonitorManager:NSObject {
                             putChar( x, y: y, c: 0x20)
                         }
                     }
-                    vram2Image()
+                    vram2ImageCG()
                     break
                     
                 case 0x13:
@@ -99,7 +107,7 @@ class MonitorManager:NSObject {
                         cursorX = 0
                     }
                     
-                    vram2Image()
+                    vram2ImageCG()
                     break
                 }
                 
@@ -115,21 +123,25 @@ class MonitorManager:NSObject {
         
     }
     
-    
-    func vram2ImageX() {
+
+    // lockFocusによるイメージ生成
+    func vram2ImageLF() {
         
         var screenImage = NSImage(size: NSSize(width: self.width * 8,height: self.height * 8))
 
         screenImage.lockFocus()
         
         for y in 0..<height {
+            let yp = (height - y) * 8
+//            NSLog("y:\(y) yp:\(yp)")
             for x in 0..<width {
                 
                 let c:UInt8 = vram[y][x]
 
-                let rect = NSRect(x: x * 8,y: (height - y) * 8, width: 8, height: 8)
+                let xp = x * 8
+                let rect = NSRect(x: xp, y: yp, width: 8, height: 8)
                 fontImage.drawInRect(rect,
-                    fromRect: fontRect(c),
+                    fromRect: fontRectX(c),
                     operation: NSCompositingOperation.CompositeDestinationOver, fraction: 1.0)
                 
             }
@@ -142,22 +154,15 @@ class MonitorManager:NSObject {
         }
     }
     
-    func fontRect(c8:UInt8) -> NSRect {
+    func fontRectX(c8:UInt8) -> NSRect {
         let c = Int(c8)
         let low = c & 0xF
         let high = 15 - ((c & 0xF0) >> 4)
         return NSRect(x: low * 8, y: high * 8, width: 8, height: 8)
     }
     
-    func fontRectX(c8:UInt8) -> NSRect {
-        let c = Int(c8)
-        let low = c & 0xF
-        let high = ((c & 0xF0) >> 4)
-        return NSRect(x: low * 8, y: high * 8, width: 8, height: 8)
-    }
-    
-    
-    func vram2Image() {
+    // Core Graphicsによるイメージ生成
+    func vram2ImageCG() {
         let image = NSBitmapImageRep(data: fontImage.TIFFRepresentation!)?.CGImage!
         
         let widthBits = width * 8
@@ -169,27 +174,27 @@ class MonitorManager:NSObject {
         let bytesPerRow = Int(4 * widthBits)
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue)
-        
-        
-
-        
         let bitmapContext = CGBitmapContextCreate(nil, widthBits, heightBits, bitsPerComponent, bytesPerRow, colorSpace, bitmapInfo)!
+
+//        CGContextSetRGBFillColor(bitmapContext, 1.0, 0.0, 0.0, 1.0);
+//        CGContextSetRGBStrokeColor(bitmapContext, 0.0, 1.0, 0.0, 1.0);
+//        CGContextFillRect(bitmapContext, NSRect(x: 0,y: 0,width: widthBits,height: heightBits));
         
         for y in 0..<height {
+            let yp =  (height - y - 1)  * 8
             for x in 0..<width {
                 
                 let c:UInt8 = vram[y][x]
                 
-                let rect = NSRect(x: x * 8, y: (height - y) * 8, width: 8, height: 8)
+                let xp = x * 8
+                let rect = NSRect(x: xp, y: yp, width: 8, height: 8)
 
-                let fontref = CGImageCreateWithImageInRect(image, fontRectX(c));
+                let fontref = CGImageCreateWithImageInRect(image, fontRect(c));
 
                 CGContextDrawImage(bitmapContext, rect, CGImageCreateCopy( fontref))
-                
             }
         }
 
-        
         // ビットマップを NSImage に変換します。
         let newImageRef = CGBitmapContextCreateImage(bitmapContext)!
         let newImage = NSImage(CGImage: newImageRef, size: NSSize(width: widthBits, height: heightBits))
@@ -197,11 +202,18 @@ class MonitorManager:NSObject {
         if let d = delegate {
             d.onDispChange(newImage)
         }
+    }
 
+    func fontRect(c8:UInt8) -> NSRect {
+        let c = Int(c8)
+        let low = c & 0xF
+        let high = ((c & 0xF0) >> 4)
+        return NSRect(x: low * 8, y: high * 8, width: 8, height: 8)
     }
     
+
     func takeImage() {
-        vram2Image()
+        vram2ImageCG()
     }
     
 }
