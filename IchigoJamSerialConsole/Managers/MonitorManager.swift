@@ -23,6 +23,9 @@ class MonitorManager:NSObject {
     
     var width:Int = 0
     var height:Int = 0
+    var widthPixels:Int = 0
+    var heightPixels:Int = 0
+
     var cursorX:Int = 0
     var cursorY:Int = 0
     
@@ -40,11 +43,26 @@ class MonitorManager:NSObject {
     
     var delegate:MonitorManagerDelegate? = nil
     
+    var bitmapContext:CGContext
+    
     private  override init() {
         width = SCREEN_CHARA_WIDTH
         height = SCREEN_CHARA_HEIGTH
+        
+        widthPixels = SCREEN_CHARA_WIDTH * 8
+        heightPixels = SCREEN_CHARA_HEIGTH * 8
+        
         vram = [[UInt8]](count: height, repeatedValue: [UInt8](count: width, repeatedValue: 0x20))
         
+        // 新しいサイズのビットマップを作成します。
+        let bitsPerComponent = Int(8)
+        let bytesPerRow = Int(4 * widthPixels)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue)
+        bitmapContext = CGBitmapContextCreate(nil, widthPixels, heightPixels,
+            bitsPerComponent, bytesPerRow, colorSpace, bitmapInfo)!
+        
+
         super.init()
         
         for y in 0 ..< height {
@@ -52,6 +70,7 @@ class MonitorManager:NSObject {
                 putChar( x, y: y, c: 0x20)
             }
         }
+        
         
     }
     
@@ -112,6 +131,10 @@ class MonitorManager:NSObject {
                 
             case .TakeY:
                 cursorY = Int(c) - 32
+                if cursorY < 0 {
+                    NSLog("invalid cursorY:\(cursorY)")
+                    cursorY = 0
+                }
                 interpreterState = .Idle
                 break
                 
@@ -119,7 +142,7 @@ class MonitorManager:NSObject {
                 
             default:
                 switch c {
-                case 0x0A:
+                case 0x0A:  // LF
                     cursorX = 0
                     cursorY++
                     if cursorY >= height {
@@ -127,7 +150,7 @@ class MonitorManager:NSObject {
                     }
                     break
                     
-                case 0x0C:
+                case 0x0C:  // カーソル位置以降の文字を削除
                     for y in cursorY ..< height {
                         for x in cursorX ..< width {
                             putChar( x, y: y, c: 0x20)
@@ -136,12 +159,16 @@ class MonitorManager:NSObject {
                     vram2ImageCG()
                     break
                     
-                case 0x13:
+                case 0x0D:  // CR
+                    cursorX = 0
+                    break
+                    
+                case 0x13:  // Page Up (カーソルを左上へ)
                     cursorX = 0
                     cursorY = 0
                     break
                     
-                case 0x15:
+                case 0x15:  // <32+<X座標>><32+<Y座標> の3バイトでカーソル移動
                     interpreterState = .TakeX
                     break
                     
@@ -151,6 +178,10 @@ class MonitorManager:NSObject {
                     cursorX++
                     if cursorX >= width {
                         cursorX = 0
+                        cursorY++
+                        if cursorY >= height {
+                           cursorY = height - 1
+                        }
                     }
                     
                     vram2ImageCG()
@@ -216,20 +247,9 @@ class MonitorManager:NSObject {
     func vram2ImageCG() {
         let image = NSBitmapImageRep(data: fontImage.TIFFRepresentation!)?.CGImage!
         
-        let widthBits = width * 8
-        let heightBits = height * 8
-        
-        
-        // 新しいサイズのビットマップを作成します。
-        let bitsPerComponent = Int(8)
-        let bytesPerRow = Int(4 * widthBits)
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue)
-        let bitmapContext = CGBitmapContextCreate(nil, widthBits, heightBits, bitsPerComponent, bytesPerRow, colorSpace, bitmapInfo)!
-        
         //        CGContextSetRGBFillColor(bitmapContext, 1.0, 0.0, 0.0, 1.0);
         //        CGContextSetRGBStrokeColor(bitmapContext, 0.0, 1.0, 0.0, 1.0);
-        //        CGContextFillRect(bitmapContext, NSRect(x: 0,y: 0,width: widthBits,height: heightBits));
+        //        CGContextFillRect(bitmapContext, NSRect(x: 0,y: 0,width: widthPixels,height: heightPixels));
         
         for y in 0..<height {
             let yp =  (height - y - 1)  * 8
@@ -248,7 +268,7 @@ class MonitorManager:NSObject {
         
         // ビットマップを NSImage に変換します。
         let newImageRef = CGBitmapContextCreateImage(bitmapContext)!
-        let newImage = NSImage(CGImage: newImageRef, size: NSSize(width: widthBits, height: heightBits))
+        let newImage = NSImage(CGImage: newImageRef, size: NSSize(width: widthPixels, height: heightPixels))
         
         if let d = delegate {
             d.onDispChange(newImage)

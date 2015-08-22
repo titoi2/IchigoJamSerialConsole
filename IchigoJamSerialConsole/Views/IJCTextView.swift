@@ -23,7 +23,7 @@ class IJCTextView: NSTextView {
     }
  
     override func keyDown(theEvent: NSEvent) {
-        NSLog("override keyDown")
+//        NSLog("override keyDown")
         keyDownDelegate?.onTextViewKeyDown(theEvent)
     }
 

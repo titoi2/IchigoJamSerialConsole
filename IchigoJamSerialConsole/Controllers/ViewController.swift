@@ -10,6 +10,7 @@ import Cocoa
 
 class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelegate, IJCTextViewDelegate {
 
+    let LOCAL_DEBUG = false
     
     let SERIAL_NOT_USE = "Serial not use"
     let SEGUE_LOAD = "load"
@@ -72,7 +73,7 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
         let ports = serialManager.ports()
         for p in ports {
             let s:ORSSerialPort = p as! ORSSerialPort
-            NSLog("path:\(s.path)")
+//            NSLog("path:\(s.path)")
             serialPopUpButton.addItemWithTitle(s.path)
         }
     }
@@ -97,7 +98,7 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
     
 
     func onKeyDown(theEvent: NSEvent) {
-        NSLog("VC onKeyDown keycode:%x", theEvent.keyCode);
+//        NSLog("VC onKeyDown keycode:%x", theEvent.keyCode);
         keyDownProc(theEvent)
     }
     
@@ -117,7 +118,7 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
                 return
             }
             let c:Int = Int(fs!.value)
-            NSLog("VC onKeyDown char:%x", c);
+//            NSLog("VC onKeyDown char:%x", c);
             var code:Int = -1
             var keyInLog:String = ""
             if c < 0x100 {
@@ -303,13 +304,24 @@ class ViewController: NSViewController, IJCSerialManagerDelegate, KeyInputDelega
         let len = data.length
         var buffer = [UInt8](count: len, repeatedValue: 0x00)
         data.getBytes(&buffer, length:len)
-        NSLog("bytes:\(buffer)")
         
+        if LOCAL_DEBUG {
+            var mess = NSMutableString()
+            for var i = 0; i<buffer.count; i++ {
+                if (i % 16) == 0 {
+                    mess.appendString("\n")
+                }
+                let b = buffer[i]
+                mess.appendString(String(format: "%02X ", b))
+            }
+            NSLog("bytes:\(mess)")
+        }
+
         // モニタに反映
         monitorManager.interpret(buffer)
         
         if let string = NSString(data: data, encoding: NSShiftJISStringEncoding) {
-            NSLog("received:\(string)")
+//            NSLog("received:\(string)")
             
             logView.selectAll(nil)
             var wholeRange:NSRange = logView.selectedRange()

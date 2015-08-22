@@ -21,7 +21,8 @@ protocol IJCSerialManagerDelegate {
 
 class IJCSerialManager:NSObject, ORSSerialPortDelegate {
     
-    
+    let LOCAL_DEBUG = false
+
     static let sharedInstance = IJCSerialManager()
     
     
@@ -106,7 +107,9 @@ class IJCSerialManager:NSObject, ORSSerialPortDelegate {
     }
     
     func serialPort(serialPort: ORSSerialPort!, didReceiveData data: NSData!) {
-        NSLog("Receive Length:\(data.length)")
+        if LOCAL_DEBUG {
+            NSLog("Receive Length:\(data.length)")
+        }
         if let d = delegate {
             d.serialPortReceived(data)
         }

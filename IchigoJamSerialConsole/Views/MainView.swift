@@ -31,14 +31,14 @@ class MainView: NSView {
     
     
     override func keyDown(theEvent: NSEvent) {
-        NSLog("MainView Key Down");
+//        NSLog("MainView Key Down");
         if  let delegate = self.delegate {
             delegate.onKeyDown(theEvent)
         }
     }
     
     override func keyUp(theEvent: NSEvent) {
-        NSLog("MainView Key Up");
+//        NSLog("MainView Key Up");
         if  let delegate = self.delegate {
             delegate.onKeyUp(theEvent)
         }
